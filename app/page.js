@@ -1,113 +1,128 @@
-import Image from 'next/image'
+'use client';
+import React from 'react';
+import Image from 'next/image';
+import Header from '@/components/Header';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [productForm, setproductForm] = useState({})
+
+  const addProduct = async (event) => {
+    event.preventDefault();
+    // const productData = {
+    //   productName,
+    //   quantity,
+    //   price,
+    // };
+    try {
+      const response = await fetch('/api/product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productForm),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add product.');
+      }
+
+      // // Clear form fields after successful addition
+      // setProductName('');
+      // setQuantity(0);
+      // setPrice(0);
+
+      alert('Product added successfully!');
+    } catch (error) {
+      console.error('Error adding product:', error.message);
+      alert('Failed to add product. Please try again later.');
+    }
+  };
+
+  const handleChange = (e) => {
+    setproductForm({ ...productForm, [e.target.name]: e.target.value });
+  }
+
+
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    // Add logic to handle form submission and update the table here
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      <Header />
+      {/* Search a Product */}
+      <div className="container bg-red-50 mx-auto p-4">
+        <h1 className="text-4xl font-bold mb-6">Search a product</h1>
+        <form className="mb-6 flex">
+          <input
+            type="text"
+            className="flex-grow border rounded-l-lg px-4 py-2"
+            placeholder="Enter product SKU..."
+          />
+          <select className="border rounded-r-lg bg-white text-gray-800 px-4 py-2">
+            <option value="SKU">SKU</option>
+            <option value="quantity">Quantity</option>
+            <option value="price">Price</option>
+          </select>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-2"
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+            Search
+          </button>
+        </form>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      {/* Add to Current Stock */}
+      <div className="container bg-red-50 mx-auto p-4">
+        <h1 className="text-4xl font-bold mb-6">Add a product</h1>
+        <form className="mb-6">
+          <div className="flex mb-4">
+            <label className="mr-2 w-24">Product SKU:</label>
+            <input name='SKU' onChange={handleChange} type="text" className="flex-grow border rounded-lg px-4 py-2" />
+          </div>
+          <div className="flex mb-4">
+            <label className="mr-2 w-24">Quantity:</label>
+            <input name='QTY' onChange={handleChange} type="number" className="flex-grow border rounded-lg px-4 py-2" />
+          </div>
+          <div className="flex mb-4">
+            <label className="mr-2 w-24">Price:</label>
+            <input name='Price' onChange={handleChange} type="number" step="0.01" className="flex-grow border rounded-lg px-4 py-2" />
+          </div>
+          <button onClick={addProduct} type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-2">
+            Add Stock
+          </button>
+        </form>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="container bg-red-50 mx-auto p-4">
+        {/* Table to display stock */}
+        <h1 className="text-4xl font-bold mb-6">Products</h1>
+        <table className="table w-full">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Product SKU</th>
+              <th className="px-4 py-2">Quantity</th>
+              <th className="px-4 py-2">Price</th>
+              {/* Add more table headers as needed */}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="px-4 py-2">Product A</td>
+              <td className="px-4 py-2">100</td>
+              <td className="px-4 py-2">$10.99</td>
+              {/* Add more table rows for each product */}
+            </tr>
+            <tr>
+              <td className="px-4 py-2">Product B</td>
+              <td className="px-4 py-2">50</td>
+              <td className="px-4 py-2">$7.99</td>
+            </tr>
+            {/* Add more table rows for each product */}
+          </tbody>
+        </table>
       </div>
-    </main>
-  )
+    </>
+  );
 }
