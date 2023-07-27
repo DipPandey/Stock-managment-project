@@ -9,9 +9,9 @@ export async function GET(request) {
       const database = client.db("stock");
       const inventory = database.collection('inventory');
       const query = { };
-      const allproducts = await inventory.find(query).toArray();
+      const products = await inventory.find(query).toArray();
       console.log("Pinged your deployment. You successfully connected to MongoDB!");
-      return NextResponse.json({allproducts});
+      return NextResponse.json({products});
     } 
     finally {
       await client.close();

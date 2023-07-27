@@ -16,7 +16,6 @@ const Header = () => {
       <a className="mr-5 hover:text-gray-900">Third Link</a>
       <a className="mr-5 hover:text-gray-900">Fourth Link</a>
     </nav>
-    
   </div>
   
 </header>
