@@ -2,7 +2,7 @@ import { MongoClient, ServerApiVersion } from "mongodb"; // Add ServerApiVersion
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  const uri = "mongodb+srv://rafayj34:rafayjamal1122@stockmanagement.ftxsygi.mongodb.net/";
+  const uri = process.env.MONGODB_URI;
   const client = new MongoClient(uri);
     try {
       await client.connect();
@@ -20,7 +20,7 @@ export async function GET(request) {
 
   export async function POST(request) {
     let body= request.body;
-    const uri = "mongodb+srv://rafayj34:rafayjamal1122@stockmanagement.ftxsygi.mongodb.net/";
+    const uri = process.env.MONGODB_URI;
     const client = new MongoClient(uri);
       try {
         await client.connect();
