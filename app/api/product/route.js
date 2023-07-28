@@ -1,8 +1,10 @@
 import { MongoClient, ServerApiVersion } from "mongodb"; // Add ServerApiVersion import here
 import { NextResponse } from "next/server";
+import { config } from "dotenv";
+config(); 
  
 export async function GET(request) {
-  const uri = process.env.MONGODB_URI ;
+  const uri = process.env.MONGODB_URI;
   const client = new MongoClient(uri);
     try {
       await client.connect();
@@ -20,7 +22,7 @@ export async function GET(request) {
 
   export async function POST(request) {
     let body= await request.json();
-    const uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGODB_URI;;
     const client = new MongoClient(uri);
       try {
         await client.connect();

@@ -8,6 +8,10 @@ export default function Home() {
   const [alert, setalert] = useState('')
   const [productForm, setproductForm] = useState({})
   const [products, setproducts] = useState([])
+  const [dropdown, setdropdown] = useState([])
+  const [query, setquery] = useState('')
+  const [loading, setloading] = useState(false)
+
   useEffect(() => {
     const fetchProducts= async () => {
       const response = await fetch('/api/product');
@@ -53,6 +57,17 @@ export default function Home() {
     event.preventDefault();
     // Add logic to handle form submission and update the table here
   };
+const onDropdownEdit = async (e) => {
+  setdropdown([])
+  setquery(e.target.value)
+  if(!loading) {
+  setloading(true)
+    const response = await fetch('/api/search?query='+ query);
+    let rjson = await response.json()
+    // console.log(rjson)
+    setdropdown(rjson.products)
+    setloading(false)
+  }}
 
   return (
     <>
@@ -61,17 +76,20 @@ export default function Home() {
       <div className="container my-5 mx-auto p-4">
         <div className='text-green-800 bg-green-200 rounded-full font-semibold text-center'>{alert}</div>
         <h1 className="text-4xl font-semibold mb-6">Search a product</h1>
-        <form className="mb-6 flex">
+        <form className="flex">
           <input
             type="text"
             className="flex-grow border rounded-l-lg px-4 py-2"
             placeholder="Enter product SKU..."
+            onChange={onDropdownEdit}
+    
           />
-          <select className="border rounded-r-lg bg-white text-gray-800 px-4 py-2">
+
+          {/* <select className="border rounded-r-lg bg-white text-gray-800 px-4 py-2">
             <option value="SKU">SKU</option>
             <option value="quantity">Quantity</option>
             <option value="price">Price</option>
-          </select>
+          </select> */}
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-2"
@@ -79,7 +97,47 @@ export default function Home() {
             Search
           </button>
         </form>
+       {loading && <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="50"
+  height="50"
+  viewBox="0 0 50 50"
+  fill="none"
+>
+  <circle
+    cx="25"
+    cy="25"
+    r="20"
+    stroke="black"
+    strokeWidth="5"
+    fill="transparent"
+    strokeDasharray="80 60"
+    transform="rotate(0)"
+  >
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      repeatCount="indefinite"
+      dur="1s"
+      keyTimes="0;1"
+      values="0 25 25;360 25 25"
+    />
+  </circle>
+</svg>}
+<div className="dropcontainer absolute w-[72vw] bg-white border-1 rounded-md">
+        {dropdown.map(item => {
+            return <div key={item.SKU} className=" my-1 p-2 container flex justify-between bg-gray-50  border-b-2 ">
+            <span className="px-4 py-3">{item.SKU} available for Rs.{item.Price}</span>
+             <div className='mx-5'>
+             <span className= "p-2 rounded-xl bg-green-100 cursor-pointer">+</span>
+             <span className= "px-4 py-3">Quantity: {item.QTY}</span>
+             <span className= "p-2 rounded-xl bg-red-100  cursor-pointer">-</span>
+             </div>
+             </div>
+          })}
+          </div> 
       </div>
+
       {/* Add to Current Stock */}
       <div className="container my-5 mx-auto p-4">
         <h1 className="text-4xl font-semibold mb-6">Add a product</h1>

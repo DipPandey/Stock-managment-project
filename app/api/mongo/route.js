@@ -1,8 +1,11 @@
 import { MongoClient, ServerApiVersion } from "mongodb"; // Add ServerApiVersion import here
 import { NextResponse } from "next/server";
+import { config } from "dotenv";
+config(); // This will read the environment variables from the .env file
+
 
 export async function GET(request) {
-  const uri = process.env.MONGODB_URI;
+  const uri = process.env.MONGODB_URI;;
   const client = new MongoClient(uri);
     try {
       await client.connect();
@@ -20,7 +23,7 @@ export async function GET(request) {
 
   export async function POST(request) {
     let body= request.body;
-    const uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGODB_URI;;
     const client = new MongoClient(uri);
       try {
         await client.connect();
