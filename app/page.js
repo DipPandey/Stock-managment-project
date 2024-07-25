@@ -2,6 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import { useEffect, useState } from 'react';
+import Sidebar from '../components/Sidebar';
 
 export default function Home() {
     const [alert, setalert] = useState('');
@@ -72,6 +73,7 @@ export default function Home() {
     return (
         <>
             <Header />
+           
             <div className="container mx-auto p-4">
                 {alert && <div className="text-green-800 bg-green-200 rounded-full font-semibold text-center mb-4">{alert}</div>}
                 <h1 className="text-4xl font-semibold mb-6 text-center">Product Management</h1>

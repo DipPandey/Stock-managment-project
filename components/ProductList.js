@@ -63,9 +63,6 @@ const ProductList = () => {
         window.open(product.orderURL, '_blank');
     };
 
-
-
-
     const updateOrderURL = async (sku, orderURL) => {
         const response = await fetch('/api/product', {
             method: 'PUT',
@@ -96,6 +93,7 @@ const ProductList = () => {
                                 <th className="px-4 py-2 border-b">Product SKU</th>
                                 <th className="px-4 py-2 border-b">Quantity</th>
                                 <th className="px-4 py-2 border-b">Price/item</th>
+                                <th className="px-4 py-2 border-b">Total Price</th>
                                 <th className="px-4 py-2 border-b">Order URL</th>
                                 <th className="px-4 py-2 border-b">Actions</th>
                             </tr>
@@ -106,6 +104,7 @@ const ProductList = () => {
                                     <td className="px-4 py-2">{product.SKU}</td>
                                     <td className="px-4 py-2">{product.QTY}</td>
                                     <td className="px-4 py-2">AUD$ {product.Price}</td>
+                                    <td className="px-4 py-2">AUD$ {(product.QTY * product.Price).toFixed(2)}</td>
                                     <td className="px-4 py-2 flex items-center">
                                         <input
                                             type="text"
