@@ -127,7 +127,7 @@ const onDropdownEdit = async (e) => {
 <div className="dropcontainer absolute w-[72vw] bg-white border-1 rounded-md">
         {dropdown.map(item => {
             return <div key={item.SKU} className=" my-1 p-2 container flex justify-between bg-gray-50  border-b-2 ">
-            <span className="px-4 py-3">{item.SKU} available for Rs.{item.Price}</span>
+            <span className="px-4 py-3">{item.SKU} available for AUD${item.Price}</span>
              <div className='mx-5'>
              <span className= "p-2 rounded-xl bg-green-100 cursor-pointer">+</span>
              <span className= "px-4 py-3">Quantity: {item.QTY}</span>
@@ -176,7 +176,7 @@ const onDropdownEdit = async (e) => {
               return <tr key={product.SKU}>
               <td className="px-4 py-2">{product.SKU}</td>
               <td className="px-4 py-2">{product.QTY}</td>
-              <td className="px-5 py-2">Rs.{product.Price}</td>
+              <td className="px-5 py-2">AUD$ {product.Price}</td>
             </tr>
           })}
           </tbody>
