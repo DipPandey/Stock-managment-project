@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb'; // Import MongoClient
+import { MongoClient, ServerApiVersion } from 'mongodb'; // Import MongoClient
 import { NextResponse } from 'next/server';
 import { config } from 'dotenv';
 config(); // Load environment variables
