@@ -9,9 +9,16 @@ const ProductList = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const response = await fetch('/api/product');
-            const data = await response.json();
-            setProducts(data.products);
+            try {
+                const response = await fetch('/api/product');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                const data = await response.json();
+                setProducts(data.products || []);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
         };
 
         fetchProducts();
@@ -24,32 +31,40 @@ const ProductList = () => {
         const newQuantity = parseInt(updatedProduct.QTY) + delta;
         if (newQuantity < 0) return;
 
-        const response = await fetch('/api/product', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ SKU: sku, QTY: newQuantity }),
-        });
+        try {
+            const response = await fetch('/api/product', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ SKU: sku, QTY: newQuantity }),
+            });
 
-        if (response.ok) {
-            setProducts(products.map(product =>
-                product.SKU === sku ? { ...product, QTY: newQuantity } : product
-            ));
-        } else {
-            console.error('Failed to update quantity');
+            if (response.ok) {
+                setProducts(products.map(product =>
+                    product.SKU === sku ? { ...product, QTY: newQuantity } : product
+                ));
+            } else {
+                console.error('Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Error updating quantity:', error);
         }
     };
 
     const deleteProduct = async (sku) => {
-        const response = await fetch(`/api/product?sku=${sku}`, {
-            method: 'DELETE',
-        });
+        try {
+            const response = await fetch(`/api/product?sku=${sku}`, {
+                method: 'DELETE',
+            });
 
-        if (response.ok) {
-            setProducts(products.filter(product => product.SKU !== sku));
-        } else {
-            console.error('Failed to delete product');
+            if (response.ok) {
+                setProducts(products.filter(product => product.SKU !== sku));
+            } else {
+                console.error('Failed to delete product');
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
         }
     };
 
@@ -59,25 +74,28 @@ const ProductList = () => {
             console.error('Order URL not set for this product');
             return;
         }
-        // Open the order URL in a new window
         window.open(product.orderURL, '_blank');
     };
 
     const updateOrderURL = async (sku, orderURL) => {
-        const response = await fetch('/api/product', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ SKU: sku, orderURL }),
-        });
+        try {
+            const response = await fetch('/api/product', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ SKU: sku, orderURL }),
+            });
 
-        if (response.ok) {
-            setProducts(products.map(product =>
-                product.SKU === sku ? { ...product, orderURL } : product
-            ));
-        } else {
-            console.error('Failed to update order URL');
+            if (response.ok) {
+                setProducts(products.map(product =>
+                    product.SKU === sku ? { ...product, orderURL } : product
+                ));
+            } else {
+                console.error('Failed to update order URL');
+            }
+        } catch (error) {
+            console.error('Error updating order URL:', error);
         }
     };
 
