@@ -17,7 +17,7 @@ export async function GET(request) {
 
         if (sku) {
             // Fetch a single product by SKU
-            const product = await inventory.findOne({ SKU: sku });
+            const product = await inventory.findOne({ SKU: new RegExp(`^${sku}$`, 'i') });
             if (!product) {
                 return NextResponse.json({ error: "Product not found" }, { status: 404 });
             }
