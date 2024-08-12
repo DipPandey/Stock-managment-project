@@ -1,8 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
-import Sidebar from '../components/Sidebar';
-import ProductList from '../components/ProductList';
+
 
 export default function Home() {
     const [alert, setAlert] = useState('');
@@ -16,9 +15,18 @@ export default function Home() {
     useEffect(() => {
         const fetchProducts = async () => {
             const response = await fetch('/api/product');
-            let rjson = await response.json();
-            setProducts(rjson.products);
+            if (!response.ok) {
+                console.error('Failed to fetch products');
+                return;
+            }
+            try {
+                let rjson = await response.json();
+                setProducts(rjson.products);
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
         };
+
         fetchProducts();
     }, []);
 
@@ -66,17 +74,32 @@ export default function Home() {
         window.location.href = `/product/${sku}`;
     };
 
-    const onDropdownEdit = async (e) => {
+    const debounce = (func, delay) => {
+        let debounceTimer;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        };
+    };
+
+    const onDropdownEdit = debounce(async (e) => {
         setDropdown([]);
         setQuery(e.target.value);
         if (!loading) {
             setLoading(true);
-            const response = await fetch(`/api/search?query=${query}`);
-            let rjson = await response.json();
-            setDropdown(rjson.products);
+            const response = await fetch('/api/search?query=' + query);
+            if (response.ok) {
+                let rjson = await response.json();
+                setDropdown(rjson.products || []);
+            } else {
+                console.error('Failed to fetch search results');
+                setDropdown([]); // Handle errors gracefully
+            }
             setLoading(false);
         }
-    };
+    }, 300); // 
 
     return (
         <>

@@ -21,6 +21,7 @@ const ProductList = () => {
             }
         };
 
+
         fetchProducts();
     }, []);
 
