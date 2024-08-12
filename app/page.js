@@ -1,22 +1,23 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
-import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import ProductList from '../components/ProductList';
 
 export default function Home() {
-    const [alert, setalert] = useState('');
-    const [productForm, setproductForm] = useState({});
-    const [products, setproducts] = useState([]);
-    const [dropdown, setdropdown] = useState([]);
-    const [query, setquery] = useState('');
-    const [loading, setloading] = useState(false);
+    const [alert, setAlert] = useState('');
+    const [productForm, setProductForm] = useState({});
+    const [products, setProducts] = useState([]);
+    const [dropdown, setDropdown] = useState([]);
+    const [query, setQuery] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
             const response = await fetch('/api/product');
             let rjson = await response.json();
-            setproducts(rjson.products);
+            setProducts(rjson.products);
         };
         fetchProducts();
     }, []);
@@ -34,13 +35,20 @@ export default function Home() {
             });
 
             if (response.ok) {
-                setalert('Your product has been added');
-                setproductForm({});
+                setAlert('Your product has been added');
+                setProductForm({});
+                setShowSuccessPopup(true);
+
+                // Hide the popup after 3 seconds
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                }, 3000);
+
                 // Refresh products list
                 const fetchProducts = async () => {
                     const response = await fetch('/api/product');
                     let rjson = await response.json();
-                    setproducts(rjson.products);
+                    setProducts(rjson.products);
                 };
                 fetchProducts();
             }
@@ -51,47 +59,48 @@ export default function Home() {
     };
 
     const handleChange = (e) => {
-        setproductForm({ ...productForm, [e.target.name]: e.target.value });
+        setProductForm({ ...productForm, [e.target.name]: e.target.value });
     };
 
-    const handleFormSubmit = (event) => {
-        event.preventDefault();
+    const handleProductClick = (sku) => {
+        window.location.href = `/product/${sku}`;
     };
 
     const onDropdownEdit = async (e) => {
-        setdropdown([]);
-        setquery(e.target.value);
+        setDropdown([]);
+        setQuery(e.target.value);
         if (!loading) {
-            setloading(true);
-            const response = await fetch('/api/search?query=' + query);
+            setLoading(true);
+            const response = await fetch(`/api/search?query=${query}`);
             let rjson = await response.json();
-            setdropdown(rjson.products);
-            setloading(false);
+            setDropdown(rjson.products);
+            setLoading(false);
         }
     };
 
     return (
         <>
             <Header />
-           
+
             <div className="container mx-auto p-4">
                 {alert && <div className="text-green-800 bg-green-200 rounded-full font-semibold text-center mb-4">{alert}</div>}
                 <h1 className="text-4xl font-semibold mb-6 text-center">Product Management</h1>
+
+                {showSuccessPopup && (
+                    <div className="fixed top-10 right-10 bg-green-200 text-green-800 rounded-lg p-4 shadow-lg">
+                        Product added successfully!
+                    </div>
+                )}
+
                 <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
                     <h2 className="text-2xl font-bold mb-4">Search a Product</h2>
-                    <form className="flex mb-4">
+                    <form className="flex mb-4" onSubmit={(e) => e.preventDefault()}>
                         <input
                             type="text"
                             className="flex-grow border rounded-l-lg px-4 py-2"
                             placeholder="Enter product SKU..."
                             onChange={onDropdownEdit}
                         />
-                        <button
-                            type="submit"
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-r-lg px-4 py-2"
-                        >
-                            Search
-                        </button>
                     </form>
                     {loading && (
                         <div className="flex justify-center mb-4">
@@ -129,18 +138,15 @@ export default function Home() {
                             <div
                                 key={item.SKU}
                                 className="my-1 p-2 container flex justify-between bg-gray-50 border-b-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => window.location.href = `/product/${item.SKU}`}
+                                onClick={() => handleProductClick(item.SKU)}
                             >
                                 <span className="px-4 py-3">{item.SKU} available for AUD${item.Price}</span>
                                 <div className="flex items-center">
-                                    <span className="p-2 rounded-xl bg-green-100 cursor-pointer">+</span>
                                     <span className="px-4 py-3">Quantity: {item.QTY}</span>
-                                    <span className="p-2 rounded-xl bg-red-100 cursor-pointer">-</span>
                                 </div>
                             </div>
                         ))}
                     </div>
-
                 </div>
 
                 <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
@@ -195,32 +201,7 @@ export default function Home() {
                         </button>
                     </form>
                 </div>
-
-                <div className="bg-white shadow-lg rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-4">Products List</h2>
-                    <table className="min-w-full bg-white border border-gray-200">
-                        <thead>
-                            <tr>
-                                <th className="px-4 py-2 border-b">Product SKU</th>
-                                <th className="px-4 py-2 border-b">Quantity</th>
-                                <th className="px-4 py-2 border-b">Price</th>
-                                <th className="px-4 py-2 border-b">Order URL</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map((product) => (
-                                <tr key={product.SKU} className="border-b">
-                                    <td className="px-4 py-2">{product.SKU}</td>
-                                    <td className="px-4 py-2">{product.QTY}</td>
-                                    <td className="px-4 py-2">AUD$ {product.Price}</td>
-                                    <td className="px-4 py-2">{product.orderURL}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </>
     );
 }
-//updates

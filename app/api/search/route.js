@@ -20,6 +20,9 @@ export async function GET(request) {
         const database = client.db("stock");
         const inventory = database.collection("inventory");
 
+        // Ensure an index exists on SKU for performance
+        await inventory.createIndex({ SKU: 1 });
+
         // Search for products where SKU matches the query (case-insensitive)
         const products = await inventory
             .find({
@@ -28,7 +31,19 @@ export async function GET(request) {
             .toArray();
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
-        return NextResponse.json({ products });
+
+        // Return a structured response
+        return NextResponse.json({
+            success: true,
+            total: products.length,
+            products: products
+        });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return NextResponse.json({
+            success: false,
+            message: "Failed to fetch products. Please try again later."
+        });
     } finally {
         await client.close();
     }

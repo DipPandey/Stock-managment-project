@@ -1,17 +1,32 @@
 import { MongoClient } from 'mongodb';
 import { NextResponse } from 'next/server';
 import { config } from 'dotenv';
+
 config();
 
 const client = new MongoClient(process.env.MONGODB_URI);
 
 export async function GET(request) {
+    const url = new URL(request.url);
+    const sku = url.searchParams.get('sku'); // Fetch the SKU from the query parameters
+
     try {
         await client.connect();
         const database = client.db("stock");
         const inventory = database.collection('inventory');
-        const products = await inventory.find({}).toArray();
-        return NextResponse.json({ products });
+
+        if (sku) {
+            // Fetch a single product by SKU
+            const product = await inventory.findOne({ SKU: sku });
+            if (!product) {
+                return NextResponse.json({ error: "Product not found" }, { status: 404 });
+            }
+            return NextResponse.json({ product });
+        } else {
+            // Fetch all products
+            const products = await inventory.find({}).toArray();
+            return NextResponse.json({ products });
+        }
     } finally {
         await client.close();
     }
@@ -46,7 +61,6 @@ export async function PUT(request) {
         await client.close();
     }
 }
-
 
 export async function DELETE(request) {
     const url = new URL(request.url);
