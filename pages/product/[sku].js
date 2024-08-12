@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Sidebar from '../../components/Sidebar';
+import '../../app/globals.css';
 
 const ProductDetail = () => {
     const router = useRouter();
