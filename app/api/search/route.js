@@ -1,31 +1,35 @@
-import { MongoClient, ServerApiVersion } from "mongodb"; // Add ServerApiVersion import here
+import { MongoClient, ServerApiVersion } from "mongodb";
 import { NextResponse } from "next/server";
 import { config } from "dotenv";
 
-config(); 
- 
+config();
+
 export async function GET(request) {
-  const query= request.nextUrl.searchParams.get("query")
-  const uri = process.env.MONGODB_URI;
-  const client = new MongoClient(uri);
+    const query = request.nextUrl.searchParams.get("query");
+    const uri = process.env.MONGODB_URI;
+    const client = new MongoClient(uri, {
+        serverApi: {
+            version: ServerApiVersion.v1,
+            strict: true,
+            deprecationErrors: true,
+        }
+    });
+
     try {
-      await client.connect();
-      const database = client.db("stock");
-      const inventory = database.collection('inventory');
-      const products = await inventory.aggregate([{
-        $match: {  
-        $or: [
-            { SKU: { $regex: query, $options: "i" } },     // Case-insensitive partial or full match for SKU
-          ]
-        }
-        }
-        ]).toArray()
+        await client.connect();
+        const database = client.db("stock");
+        const inventory = database.collection("inventory");
 
-      console.log("Pinged your deployment. You successfully connected to MongoDB!");
-      return NextResponse.json({products});
-    } 
-    finally {
-      await client.close();
+        // Search for products where SKU matches the query (case-insensitive)
+        const products = await inventory
+            .find({
+                SKU: { $regex: new RegExp(query, "i") }
+            })
+            .toArray();
+
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        return NextResponse.json({ products });
+    } finally {
+        await client.close();
     }
-  }
-
+}

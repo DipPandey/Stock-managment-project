@@ -129,7 +129,7 @@ export default function Home() {
                             <div
                                 key={item.SKU}
                                 className="my-1 p-2 container flex justify-between bg-gray-50 border-b-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => window.location.href = '/'}
+                                onClick={() => window.location.href = `/product/${item.SKU}`}
                             >
                                 <span className="px-4 py-3">{item.SKU} available for AUD${item.Price}</span>
                                 <div className="flex items-center">
@@ -140,6 +140,7 @@ export default function Home() {
                             </div>
                         ))}
                     </div>
+
                 </div>
 
                 <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
