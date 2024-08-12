@@ -9,7 +9,7 @@ const Header = () => {
      
     </a>
     <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
-      <a className="mr-5 hover:text-gray-900">Built using next.js, mongoDb and vercel</a>
+      <a className="mr-5 hover:text-gray-900">Built using next.js, mongoDb and Netlify to deploy</a>
       <a className="mr-5 hover:t ext-gray-900">by Dip Pandey</a>
    
     </nav>
