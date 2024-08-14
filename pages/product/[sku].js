@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Sidebar from '../../components/Sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import '../../app/globals.css';
 
 const ProductDetail = () => {
@@ -11,6 +11,7 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [alert, setAlert] = useState('');
 
     useEffect(() => {
         if (!sku) return;
@@ -33,40 +34,48 @@ const ProductDetail = () => {
         fetchProduct();
     }, [sku]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-blue-500"></div>
+            </div>
+        );
+    }
 
-    const updateQuantity = async (delta) => {
+    if (error) return <div className="text-red-500 text-center">{error}</div>;
+
+    const updateQuantity = (delta) => {
         const newQuantity = parseInt(product.QTY) + delta;
         if (newQuantity < 0) return;
 
-        try {
-            const response = await fetch('/api/product', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ SKU: product.SKU, QTY: newQuantity }),
-            });
+        // Update the UI immediately
+        setProduct(prevProduct => ({ ...prevProduct, QTY: newQuantity }));
 
-            if (response.ok) {
-                setProduct({ ...product, QTY: newQuantity });
-            } else {
-                console.error('Failed to update quantity');
-            }
-        } catch (error) {
-            console.error('Error updating quantity:', error);
-        }
+        // Asynchronously update the backend
+        fetch('/api/product', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ SKU: product.SKU, QTY: newQuantity }),
+        }).catch(error => console.error('Error updating quantity:', error));
     };
 
     const deleteProduct = async () => {
+        // Immediately update the UI for a faster user experience
+        setProduct(null);
+
         try {
             const response = await fetch(`/api/product?sku=${product.SKU}`, {
                 method: 'DELETE',
             });
 
             if (response.ok) {
-                router.push('/');
+                setAlert('Product successfully deleted!');
+                setTimeout(() => {
+                    setAlert('');
+                    router.push('/product-list');  // Redirect to the product list page after deletion
+                }, 3000);
             } else {
                 console.error('Failed to delete product');
             }
@@ -94,7 +103,8 @@ const ProductDetail = () => {
             });
 
             if (response.ok) {
-                console.log('Order URL updated');
+                setAlert('Order URL updated successfully!');
+                setTimeout(() => setAlert(''), 3000);
             } else {
                 console.error('Failed to update order URL');
             }
@@ -109,6 +119,7 @@ const ProductDetail = () => {
             <div className="ml-64 flex-1 p-6">
                 <div className="container mx-auto p-4 bg-white shadow rounded-lg">
                     <h1 className="text-4xl font-semibold mb-6">Product Details</h1>
+                    {alert && <div className="text-green-800 bg-green-200 rounded-full font-semibold text-center mb-4 p-2">{alert}</div>}
                     <table className="min-w-full bg-white border border-gray-200">
                         <thead>
                             <tr>
@@ -121,54 +132,56 @@ const ProductDetail = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="border-b">
-                                <td className="px-4 py-2">{product.SKU}</td>
-                                <td className="px-4 py-2">{product.QTY}</td>
-                                <td className="px-4 py-2">AUD$ {product.Price}</td>
-                                <td className="px-4 py-2">AUD$ {(product.QTY * product.Price).toFixed(2)}</td>
-                                <td className="px-4 py-2 flex items-center">
-                                    <input
-                                        type="text"
-                                        value={product.orderURL || ''}
-                                        onChange={(e) => setProduct({ ...product, orderURL: e.target.value })}
-                                        className="border rounded-lg px-2 py-1 flex-grow"
-                                        placeholder="Order URL"
-                                    />
-                                    <button
-                                        onClick={updateOrderURL}
-                                        className="ml-2 text-blue-300 hover:text-blue-700"
-                                    >
-                                        <FontAwesomeIcon icon={faUpload} />
-                                        Update
-                                    </button>
-                                </td>
-                                <td className="px-4 py-2 flex space-x-2">
-                                    <button
-                                        onClick={() => updateQuantity(1)}
-                                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                                    >
-                                        +
-                                    </button>
-                                    <button
-                                        onClick={() => updateQuantity(-1)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    >
-                                        -
-                                    </button>
-                                    <button
-                                        onClick={deleteProduct}
-                                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button>
-                                    <button
-                                        onClick={orderProduct}
-                                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                                    >
-                                        Order
-                                    </button>
-                                </td>
-                            </tr>
+                            {product && (
+                                <tr className="border-b">
+                                    <td className="px-4 py-2">{product.SKU}</td>
+                                    <td className="px-4 py-2">{product.QTY}</td>
+                                    <td className="px-4 py-2">AUD$ {product.Price}</td>
+                                    <td className="px-4 py-2">AUD$ {(product.QTY * product.Price).toFixed(2)}</td>
+                                    <td className="px-4 py-2 flex items-center">
+                                        <input
+                                            type="text"
+                                            value={product.orderURL || ''}
+                                            onChange={(e) => setProduct({ ...product, orderURL: e.target.value })}
+                                            className="border rounded-lg px-2 py-1 flex-grow"
+                                            placeholder="Order URL"
+                                        />
+                                        <button
+                                            onClick={updateOrderURL}
+                                            className="ml-2 text-blue-500 hover:text-blue-700"
+                                        >
+                                            <FontAwesomeIcon icon={faUpload} />
+                                            Update
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-2 flex space-x-2">
+                                        <button
+                                            onClick={() => updateQuantity(1)}
+                                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                        >
+                                            +
+                                        </button>
+                                        <button
+                                            onClick={() => updateQuantity(-1)}
+                                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                        >
+                                            -
+                                        </button>
+                                        <button
+                                            onClick={deleteProduct}
+                                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                        <button
+                                            onClick={orderProduct}
+                                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                        >
+                                            Order
+                                        </button>
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
