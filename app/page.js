@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-
+import { useRouter } from 'next/router';
 export default function Home() {
     const [alert, setAlert] = useState('');
     const [productForm, setProductForm] = useState({});
@@ -219,6 +219,11 @@ export default function Home() {
                             <button
                                 type="submit"
                                 className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-2 w-full"
+                                onClick={async (event) => {
+                                    event.preventDefault();
+                                    await addProduct(event);
+                                    router.push('/product-list');
+                                }}
                             >
                                 Add Stock
                             </button>

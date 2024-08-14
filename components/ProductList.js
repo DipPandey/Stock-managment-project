@@ -13,6 +13,7 @@ const ProductList = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
+            setLoading(true);
             try {
                 const response = await fetch('/api/product');
                 if (!response.ok) {
@@ -28,7 +29,7 @@ const ProductList = () => {
         };
 
         fetchProducts();
-    }, []);
+    }, [router.asPath]); // Re-fetch data whenever the route changes
 
     const updateQuantity = (sku, delta) => {
         const updatedProduct = products.find(product => product.SKU === sku);
