@@ -1,34 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Product Management Software
+
+This project is a Product Management tool built using Next.js and MongoDB, designed to manage inventory, track products, and streamline workflow processes.
 
 ## Getting Started
 
-First, run the development server:
+To get started with this project, follow the instructions below to set up your development environment.
 
-```bash
+### Prerequisites
+
+Ensure you have the following installed on your machine:
+
+- Node.js (v12.x or higher)
+- npm (v6.x or higher)
+- MongoDB (you can set up a local instance or use a cloud service like MongoDB Atlas)
+
+### Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/yourusername/product-management.git
+   cd product-management
+
+   npm install
+# or
+yarn install
+
+Create a .env.local file in the root of your project and add the following variables:
+
+bash
+Copy code
+MONGODB_URI=mongodb://localhost:27017/your-database-name
+Replace your-database-name with the name of your MongoDB database. If you are using MongoDB Atlas, your MONGODB_URI will look something like this:
+
+bash
+Copy code
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/your-database-name?retryWrites=true&w=majority
+Run the development server:
+
+bash
+Copy code
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-```
+Open http://localhost:3000 with your browser to see the result.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Features
+Product Management: Add, edit, and delete products in your inventory.
+Real-time Updates: Changes to product quantities are instantly reflected in the UI.
+Search Functionality: Quickly find products using the search feature.
+Order Tracking: Manage and track product orders with custom URLs.
+MongoDB Setup
+This project uses MongoDB to store product data. To set up MongoDB:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Install MongoDB:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+On macOS: brew install mongodb-community@4.4
+On Ubuntu: sudo apt-get install -y mongodb-org
+On Windows: Download and install from here.
+Run MongoDB locally:
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+bash
+Copy code
+mongod --dbpath /path/to/your/database
